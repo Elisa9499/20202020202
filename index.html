@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sketch</title>
+
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+
+      #menu {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 10px;
+        border-radius: 10px;
+        list-style: none;
+        margin: 0;
+        width: 200px;
+      }
+
+      #menu li {
+        margin: 10px 0;
+        text-align: center;
+      }
+
+      #menu li button {
+        width: 100%;
+        padding: 10px;
+        background-color: black;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      #menu li button:hover {
+        background-color: #333;
+      }
+
+      #videoIframe {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        height: 60%;
+        border: 2px solid #ccc;
+        z-index: 1000;
+      }
+
+      #iframeOverlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+      }
+
+      #submenu {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 10px;
+        list-style: none;
+        margin: 0;
+        width: 300px;
+        z-index: 1001;
+        text-align: center;
+      }
+
+      #submenu li {
+        margin: 10px 0;
+      }
+
+      #submenu li button {
+        width: 100%;
+        padding: 10px;
+        background-color: black;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      #submenu li button:hover {
+        background-color: #333;
+      }
+
+      #introBox {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        background-color: white;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        z-index: 1002;
+      }
+
+      #introBox img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+      }
+
+      #introOverlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1001;
+      }
+    </style>
+  </head>
+
+  <body>
+    <ul id="menu">
+      <li>
+        <button onclick="showIntro()">自我介紹</button>
+      </li>
+      <li>
+        <button onclick="toggleSubmenu()">作品集</button>
+        <ul id="submenu">
+          <li><button onclick="showPortfolio('https://elisa9499.github.io/1111111/')">第一周</button></li>
+          <li><button onclick="showPortfolio('https://elisa9499.github.io/0314/')">第二周</button></li>
+          <li><button onclick="showPortfolio('https://elisa9499.github.io/20250328/')">第三周</button></li>
+          <li><button onclick="showPortfolio('https://hackmd.io/@elisaa/HyED6Duylg')">第四周</button></li>
+        </ul>
+      </li>
+      <li><button onclick="showExam()">測驗卷</button></li>
+      <li><button onclick="showVideo()">教學影片</button></li>
+    </ul>
+    <div id="introOverlay" onclick="hideIntro()"></div>
+    <div id="introBox">
+      <img src="1.JPG"  />
+      <p>姓名: 蔡以紜</p>
+      <p>科系: 教育科技學系</p>
+      <p>學號: 413730804</p>
+      <p>興趣: 跳舞/Kpop</p>
+    </div>
+    <div id="iframeOverlay" onclick="hideVideo()"></div>
+    <iframe
+      id="videoIframe"
+      src=""
+      frameborder="0"
+      allowfullscreen
+    ></iframe>
+
+    <script src="libraries/p5.min.js"></script>
+    <script src="libraries/p5.sound.min.js"></script>
+    <script>
+      let housePositions = [];
+      let starPositions = [];
+      let numHouses = 40;
+      let numStars = 50;
+
+      function setup() {
+        createCanvas(windowWidth, windowHeight);
+
+        for (let i = 0; i < numHouses; i++) {
+          housePositions.push({
+            x: random(width),
+            y: random(height),
+            xSpeed: random(-1, 1),
+            ySpeed: random(-1, 1),
+          });
+        }
+
+        for (let i = 0; i < numStars; i++) {
+          starPositions.push({
+            x: random(width),
+            y: random(height),
+            xSpeed: random(-1, 1),
+            ySpeed: random(-1, 1),
+          });
+        }
+      }
+
+      function draw() {
+        background("#5a189a");
+
+        let houseSize = map(mouseX, 0, width, 20, 100);
+        let starSize = map(mouseX, 0, width, 5, 20);
+
+        for (let i = 0; i < numHouses; i++) {
+          let house = housePositions[i];
+          house.x += house.xSpeed;
+          house.y += house.ySpeed;
+
+          if (house.x < 0 || house.x > width) house.xSpeed *= -1;
+          if (house.y < 0 || house.y > height) house.ySpeed *= -1;
+
+          drawHouse(house.x, house.y, houseSize);
+        }
+
+        for (let i = 0; i < numStars; i++) {
+          let star = starPositions[i];
+          star.x += star.xSpeed;
+          star.y += star.ySpeed;
+
+          if (star.x < 0 || star.x > width) star.xSpeed *= -1;
+          if (star.y < 0 || star.y > height) star.ySpeed *= -1;
+
+          drawStar(star.x, star.y, starSize);
+        }
+      }
+
+      function drawHouse(x, y, size) {
+        fill(0);
+        rect(x, y, size, size);
+
+        triangle(
+          x, y,
+          x - size / 2, y + size / 2,
+          x + size / 2, y + size / 2
+        );
+
+        triangle(
+          x + size, y,
+          x + size - size / 2, y + size / 2,
+          x + size + size / 2, y + size / 2
+        );
+      }
+
+      function drawStar(x, y, size) {
+        fill(0);
+        noStroke();
+        beginShape();
+        for (let i = 0; i < 5; i++) {
+          let angle = TWO_PI / 5 * i - HALF_PI;
+          let x1 = x + cos(angle) * size;
+          let y1 = y + sin(angle) * size;
+          vertex(x1, y1);
+          angle += TWO_PI / 10;
+          x1 = x + cos(angle) * (size / 2);
+          y1 = y + sin(angle) * (size / 2);
+          vertex(x1, y1);
+        }
+        endShape(CLOSE);
+      }
+
+      function openWindow(url) {
+        window.open(url, "_blank", "width=800,height=600,top=100,left=100");
+      }
+
+      function showVideo() {
+        closeAll(); // 關閉其他方框或 iframe
+        const iframe = document.getElementById("videoIframe");
+        iframe.src = "https://cfchen58.synology.me/%E7%A8%8B%E5%BC%8F%E8%A8%AD%E8%A8%882024/A2/week4/20250314_101826.mp4";
+        iframe.style.display = "block";
+        document.getElementById("iframeOverlay").style.display = "block";
+      }
+
+      function hideVideo() {
+        document.getElementById("videoIframe").style.display = "none";
+        document.getElementById("iframeOverlay").style.display = "none";
+      }
+
+      function toggleSubmenu() {
+        closeAll(); // 關閉其他方框或 iframe
+        const submenu = document.getElementById("submenu");
+        submenu.style.display = submenu.style.display === "block" ? "none" : "block";
+      }
+
+      function showPortfolio(url) {
+        closeAll(); // 關閉其他方框或 iframe
+        const iframe = document.getElementById("videoIframe");
+        iframe.src = url;
+        iframe.style.display = "block";
+        document.getElementById("iframeOverlay").style.display = "block";
+      }
+
+      function showIntro() {
+        closeAll(); // 關閉其他方框或 iframe
+        document.getElementById("introBox").style.display = "block";
+        document.getElementById("introOverlay").style.display = "block";
+      }
+
+      function hideIntro() {
+        document.getElementById("introBox").style.display = "none";
+        document.getElementById("introOverlay").style.display = "none";
+      }
+
+      function closeAll() {
+        hideIntro();
+        hideVideo();
+        document.getElementById("submenu").style.display = "none";
+      }
+
+      function showExam() {
+        closeAll(); // 關閉其他方框或 iframe
+        const iframe = document.getElementById("videoIframe");
+        iframe.src = "https://elisa9499.github.io/exam/";
+        iframe.style.display = "block";
+        document.getElementById("iframeOverlay").style.display = "block";
+      }
+    </script>
+  </body>
+</html>
